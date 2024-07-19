@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=AIS20231109104652
+    username: sa
+    password: Aa1216390501ttt
+
+  profiles:
+    active: dev # 默认使用开发环境配置

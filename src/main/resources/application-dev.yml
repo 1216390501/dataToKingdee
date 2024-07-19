@@ -1,0 +1,36 @@
+server:
+  port: 8017
+
+spring:
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=AIS20231109104652
+    username: sa
+    password: Aa1216390501
+
+    jpa:
+      open-in-view: false
+
+#  jpa:
+#    hibernate:
+#      ddl-auto: update #  意思我在项目中加了一个字段，数据库会自动增加一个相应的字段
+logging:
+  level:
+    root: info # 从环境取
+    com.test.demo: info
+  file:
+    name: logs/demo-server.log
+  logback:
+    rollingpolicy:
+      max-file-size: 2MB
+      file-name-pattern: logs/demo-server.%d{yyyy-MM-dd}.%i.log
+
+
+kingdee:
+
+  acctId: 654c4992576f5d
+  username: Administrator
+  password: Aa1216390501*
+
+  lcid: 2052
+  serverurl: http://localhost//k3cloud/
