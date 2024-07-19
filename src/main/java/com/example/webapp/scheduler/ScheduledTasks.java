@@ -41,6 +41,8 @@ public class ScheduledTasks {
         //接口
         JSONArray objects = selectfrom.selectWL("1");
 //        selectfrom.billSave();
+//        selectfrom.billSave();
+//        selectfrom.billSave();
 
 
         K3CloudApi api = new K3CloudApi();
