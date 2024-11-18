@@ -12,7 +12,8 @@ spring:
 #    jpa:
 #      open-in-view: false
 
-    url: jdbc:oracle:thin:@//db.00.forestpacking.com:1522/dbms
+    url: jdbc:oracle:thin:@//36.138.132.30:1521/dbms
+#    url: jdbc:oracle:thin:@//db.00.forestpacking.com:1522/dbms
     username: read
     password: ejsh.read
     driver-class-name: oracle.jdbc.OracleDriver
@@ -46,9 +47,9 @@ logging:
 
 kingdee:
 
-  acctId: 66d13152ffa37b
-  username: 13165654149
-  password: Aa1216390501
+  acctId: 66bc19b17df4ca
+  username: Administrator
+  password: slbz.2024
 
   lcid: 2052
   serverurl: http://localhost//k3cloud/

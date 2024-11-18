@@ -31,7 +31,6 @@ public class KingdeeApi {
 //登录 ，十分钟登陆一次
     public String login() {
         Date dNow = new Date( );
-
         if (Cookie.getCookStr()==null||Cookie.getNowDate()==null|| dNow.getTime()-  Cookie.getNowDate().getTime()>1000000)
         {
             loginWait();
@@ -68,9 +67,12 @@ public class KingdeeApi {
 
         if (jsonObject.getLong("LoginResultType")==1){
             log.info("登录成功");
-            String cookieStr = result2.getCookies().get(0).toString() + ";" + result2.getCookies().get(1).toString();
+            Cookie.setCookStr(null);
+//            String cookieStr = result2.getCookies().get(0).toString() + ";" + result2.getCookies().get(1).toString();
+            String cookieStr =  result2.getCookies().get(1).toString();
             Cookie.setCookStr(cookieStr);
             Cookie.setNowDate(new Date());
+            System.out.println("CookStr:"+Cookie.getCookStr());
         }else{
             log.error("登录失败");
 
@@ -124,6 +126,7 @@ public class KingdeeApi {
     public JSONObject kingdeeSave(Form form){
         login();
         String formStr=JSON.toJSONString(form);
+        log.info("保存接口json："+formStr);
         HttpResponse formSave = HttpRequest.post(serverurl+"Kingdee.BOS.WebApi.ServicesStub.DynamicFormService.Save.common.kdsvc")
                 .cookie(Cookie.getCookStr()).body(formStr).execute();
         JSONObject formSavejsonObject = JSON.parseObject(formSave.body());
@@ -131,31 +134,8 @@ public class KingdeeApi {
 
     }
 
-    public JSONObject kingdeeSubmitJO(Form form){
-        login();
-        log.info("金蝶提交接口开始工作。。。。。。。。");
-        String formStr=JSON.toJSONString(form);
-        log.info("金蝶保存接口提交的请求json: "+formStr);
-        HttpResponse form1Save = HttpRequest.post(serverurl+"Kingdee.BOS.WebApi.ServicesStub.DynamicFormService.Submit.common.kdsvc")
-                .cookie(Cookie.getCookStr()).body(formStr).execute();
 
-        log.info("金蝶保存接口提交的响应json: "+form1Save.body());
-        JSONObject formSubmitJsonObject = JSON.parseObject(form1Save.body());
-        return formSubmitJsonObject;
-    }
 
-    public JSONObject kingdeeAuditJO(Form form){
-        login();
-        log.info("金蝶提交接口开始工作。。。。。。。。");
-        String formStr=JSON.toJSONString(form);
-        log.info("金蝶保存接口审核的请求json: "+formStr);
-        HttpResponse form1Save = HttpRequest.post(serverurl+"Kingdee.BOS.WebApi.ServicesStub.DynamicFormService.Audit.common.kdsvc")
-                .cookie(Cookie.getCookStr()).body(formStr).execute();
-
-        log.info("金蝶保存接口审核的响应json: "+form1Save.body());
-        JSONObject formSubmitJsonObject = JSON.parseObject(form1Save.body());
-        return formSubmitJsonObject;
-    }
 
     //金蝶暂存接口
     public String kingdeeDraft(Form form){
@@ -165,7 +145,7 @@ public class KingdeeApi {
         HttpResponse form1Save = HttpRequest.post(serverurl+"Kingdee.BOS.WebApi.ServicesStub.DynamicFormService.Draft.common.kdsvc")
                 .cookie(Cookie.getCookStr()).body(formStr).execute();
 
-        log.info("金蝶保存接口暂存的响应json: "+form1Save.body());
+
         return form1Save.body();
 
 
@@ -178,7 +158,7 @@ public class KingdeeApi {
         HttpResponse form1Save = HttpRequest.post(serverurl+"Kingdee.BOS.WebApi.ServicesStub.DynamicFormService.Submit.common.kdsvc")
                 .cookie(Cookie.getCookStr()).body(formStr).execute();
 
-        log.info("金蝶保存接口提交的响应json: "+form1Save.body());
+        log.info("金蝶提交的响应json: "+form1Save.body());
         return form1Save.body();
 
 
@@ -192,7 +172,7 @@ public class KingdeeApi {
         HttpResponse form1Save = HttpRequest.post(serverurl+"Kingdee.BOS.WebApi.ServicesStub.DynamicFormService.Audit.common.kdsvc")
                 .cookie(Cookie.getCookStr()).body(formStr).execute();
 
-        log.info("金蝶保存接口审核的响应json: "+form1Save.body());
+        log.info("金蝶审核的响应json: "+form1Save.body());
         return form1Save.body();
     }
     public String kingdeeUnAudit(Form form){
@@ -202,7 +182,7 @@ public class KingdeeApi {
         HttpResponse form1Save = HttpRequest.post(serverurl+"Kingdee.BOS.WebApi.ServicesStub.DynamicFormService.UnAudit.common.kdsvc")
                 .cookie(Cookie.getCookStr()).body(formStr).execute();
 
-        log.info("金蝶保存接口反审核的响应json: "+form1Save.body());
+        log.info("金蝶反审核的响应json: "+form1Save.body());
         return form1Save.body();
     }
     public String kingdeeDelete(Form form){
@@ -213,7 +193,7 @@ public class KingdeeApi {
         HttpResponse form1Save = HttpRequest.post(serverurl+"Kingdee.BOS.WebApi.ServicesStub.DynamicFormService.Delete.common.kdsvc")
                 .cookie(Cookie.getCookStr()).body(formStr).execute();
 
-        log.info("金蝶保存接口删除的响应json: "+form1Save.body());
+        log.info("金蝶删除的响应json: "+form1Save.body());
         return form1Save.body();
     }
     //金蝶下推接口
@@ -224,7 +204,7 @@ public class KingdeeApi {
         HttpResponse form1Save = HttpRequest.post(serverurl+"Kingdee.BOS.WebApi.ServicesStub.DynamicFormService.Push.common.kdsvc")
                 .cookie(Cookie.getCookStr()).body(formStr).execute();
 
-        log.info("金蝶保存接口下推的响应json: "+form1Save.body());
+        log.info("金蝶下推的响应json: "+form1Save.body());
         return form1Save.body();
 
 
