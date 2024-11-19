@@ -56,7 +56,7 @@ public class KingdeeApi {
             result2 = HttpRequest.post(serverurl + "Kingdee.BOS.WebApi.ServicesStub.AuthService.ValidateUser.common.kdsvc")
                     .body(loginStr).execute();}
         catch (Exception e) {
-            log.info("金蝶登录接口出现异常："+e.toString()+e.getMessage());
+            log.info("金蝶登录接口出现异常 ："+e.toString()+e.getMessage());
 
         }
 
