@@ -8,7 +8,7 @@ import com.example.webapp.entity.YourEntity;
 import com.example.webapp.service.OderService;
 import com.example.webapp.service.SelectForm;
 import com.example.webapp.service.YourEntityService;
-import com.kingdee.bos.webapi.sdk.K3CloudApi;
+//import com.kingdee.bos.webapi.sdk.K3CloudApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.apache.http.client.methods.HttpPost;
