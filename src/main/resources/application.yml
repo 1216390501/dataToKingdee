@@ -1,9 +1,18 @@
+#spring:
+#  datasource:
+#    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#    url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=AIS20231109104652
+#    username: sa
+#    password: Aa1216390501ttt
 spring:
   datasource:
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=AIS20231109104652
-    username: sa
-    password: Aa1216390501ttt
-
+    url: jdbc:oracle:thin:@//36.138.132.30:1521/dbms
+#    url: jdbc:oracle:thin:@//db.00.forestpacking.com:1522/dbms
+    username: read
+    password: ejsh.read
+    driver-class-name: oracle.jdbc.OracleDriver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
   profiles:
-    active: dev # 默认使用开发环境配置
+    active: uat # 默认使用开发环境配置

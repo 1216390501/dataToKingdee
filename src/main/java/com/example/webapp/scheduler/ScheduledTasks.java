@@ -2,10 +2,13 @@ package com.example.webapp.scheduler;
 
 import com.alibaba.fastjson.JSONArray;
 import com.example.webapp.apiRequest.KingdeeApi;
+import com.example.webapp.entity.Pojo.wsyj.OrderDetail;
+import com.example.webapp.entity.Pojo.wsyj.OrderInfo;
 import com.example.webapp.entity.YourEntity;
+import com.example.webapp.service.OderService;
 import com.example.webapp.service.SelectForm;
 import com.example.webapp.service.YourEntityService;
-import com.kingdee.bos.webapi.sdk.K3CloudApi;
+//import com.kingdee.bos.webapi.sdk.K3CloudApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.apache.http.client.methods.HttpPost;
@@ -15,6 +18,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -24,31 +30,42 @@ public class ScheduledTasks {
     @Autowired
     private SelectForm selectfrom;
 
+    @Autowired
+    private OderService oderService;
+
     //数据库
     private final YourEntityService yourEntityService;
+
 
     @Autowired
     public ScheduledTasks(YourEntityService yourEntityService) {
         this.yourEntityService = yourEntityService;
     }
 
-    @Scheduled(fixedRate = 5000) // 每5分钟执行一次
+    @Scheduled(fixedRate = 1000*60*60*24) // 每5秒执行一次
     public void fetchDataAndSend() throws Exception {
-        System.out.println("我是输出");
-        //数据库
-        List<YourEntity> entities = yourEntityService.fetchEntities();
+//        System.out.println("我是输出");
 
+
+        oderService.findOderData();//销售订单
+//        oderService.instockData();//简单生产入库
+//        oderService.outstockData();//销售出库
+        //数据库
+//        List<YourEntity> entities = yourEntityService.fetchEntities();
+//        oderService.findWithPagination();
         //接口
-        JSONArray objects = selectfrom.selectWL("1");
+//        JSONArray objects = selectfrom.selectWL("1");
+//        selectfrom.billSave();
+//        selectfrom.billSave();
 //        selectfrom.billSave();
 
 
-        K3CloudApi api = new K3CloudApi();
-        String data = "{\"CreateOrgId\":0,\"Number\":\"1.01.001\",\"Id\":\"\",\"IsSortBySeq\":\"false\"}";
-        String bd_material = api.view("BD_MATERIAL", data);
-
-
-        log.info("Success :" + bd_material);
+//        K3CloudApi api = new K3CloudApi();
+//        String data = "{\"CreateOrgId\":0,\"Number\":\"1.01.001\",\"Id\":\"\",\"IsSortBySeq\":\"false\"}";
+//        String bd_material = api.view("BD_MATERIAL", data);
+//
+//
+//        log.info("Success :" + bd_material);
     }
 
 
