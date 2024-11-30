@@ -60,7 +60,6 @@ public class OrderDetail {
     private String bsizel; //切长
     private String bwidth; //纸幅
 
-
     private String maktyp; //打订方式
     private String FNAME; // 产品
     private String FCPXX; // 箱型
