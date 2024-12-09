@@ -22,11 +22,12 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.Date;
 
 import static cn.hutool.core.date.DateUtil.formatDateTime;
 @Slf4j
@@ -38,6 +39,8 @@ public class OderService {
     private OrderDetailMapper orderDetailMapper;
     @Autowired
     private KingdeeApi kingdeeApi;
+    @Autowired
+    private RDBConnectionUtil  ConnectionUtil;
 
     //星空api
     @Autowired
@@ -78,10 +81,144 @@ public class OderService {
         LocalDateTime startLocalDateTime = LocalDateTime.of(2024, 8, 27, 0, 0);
         Date startDate = Date.from(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant());
         try {
-            List<OrderDetail> data = orderMapper.findData(formattedTime,dateString);
+//            List<Map<String, Object>> maps = saleBillDaoImplementation.queryDataFromOracle();
+            Connection conn = ConnectionUtil.getRDBConnection();
+            Statement stat = conn.createStatement();
+            String sql = "SELECT t.id,\n" +
+                    "        DECODE(t.orgcde,'03','温森一期二期','05','温森三期','00','大溪老厂') AS FFactory,  --厂区\n" +
+                    "        'U' AS FGXSTATUS,   --t.opmode\n" +
+                    "        t.serial AS FBILLNO,\n" +
+                    "        t.mkpcde AS FBJBILLNO,   -- 报价单\n" +
+                    "        --ptdate AS 日期,\n" +
+                    "        d.bwidth AS FFF,        --门幅#\n" +
+                    "        t.updated AS  FGXDATE,   --时间\n" +
+                    "        t.clntcde AS FKHNUMBER, --客户代码\n" +
+                    "        DECODE(t.objtyp,'CB','箱片','CT','纸箱','CL','彩盒','CC','数码平板','CD','数码','CJ','精品盒',t.objtyp) || '-' || SUBSTR(b.crrcde, 1, 1) || '-' ||\n" +
+                    "        REPLACE(REGEXP_SUBSTR(b.matcde, '[^-]+', 1, 1), '/', '') || '+' ||\n" +
+                    "        SUBSTR(b.crrcde, 2) WLMC,\n" +
+                    "        (SELECT i.clntnme FROM pb_clnt i WHERE i.orgcde=t.orgcde AND i.clntcde=t.clntcde AND ROWNUM=1) AS FKHNAME,   -- 客户t.clntnme\n" +
+                    "        (SELECT \n" +
+                    "                CASE t.objtyp WHEN 'CB' THEN \n" +
+                    "                        CASE WHEN i.smpnme LIKE '%快印包%' THEN i.jurnme || '（快印包）'\n" +
+                    "                        ELSE i.jurnme \n" +
+                    "                        END\n" +
+                    "                ELSE \n" +
+                    "                        CASE WHEN i.smpnme LIKE '%快印包%' THEN  '（快印包）' || i.clntnme\n" +
+                    "                        ELSE i.clntnme \n" +
+                    "                        END\n" +
+                    "                END \n" +
+                    "        FROM pb_clnt i WHERE i.orgcde=t.orgcde AND i.clntcde = t.clntcde) AS FKHYWYName, --客户业务员 #子账户\n" +
+                    "        (SELECT i.agntcde FROM pb_clnt_atta i WHERE i.orgcde=t.orgcde AND i.clntcde = t.clntcde AND ROWNUM=1) AS FYWYNUMBER,  --销售员代码\n" +
+                    "        --agntcde AS FYWYNUMBER,  --销售员代码\n" +
+                    "        (SELECT d.empnme FROM pb_clnt_atta i,pb_dept_member d WHERE i.clientid = t.clientid AND i.orgcde = t.orgcde AND i.clntcde = t.clntcde\n" +
+                    "            AND i.agntcde = d.empcde\n" +
+                    "            AND ROWNUM=1 ) AS FYWYNAME, --销售员名称\n" +
+                    "        --agntnme AS FYWYNAME, --销售员名称\n" +
+                    "        t.objtyp AS FCPLX,  --类型\n" +
+                    "        t.prdnme AS FNAME,b.OSIZEH AS high, --高\n" +
+                    "        b.OSIZEL AS length, --长\n" +
+                    "        b.OSIZEW AS wide, --宽 \n" +
+                    "        b.PRSTYP AS yx, --压线 \n" +
+                    "        b.ordtyp AS ddlx, --订单类型 \n" +
+                    "        d.tptype AS tptype, --模板类型 \n" +
+                    "        t.brand AS brand, --品牌 \n" +
+                    "        b.spcnum AS spcnum, --专色数 \n" +
+                    "        b.colnum AS colnum, --色素数 \n" +
+                    "        b.ctlnum AS ctlnum, --数量控制 \n" +
+                    "        b.tmpcde AS tmpcde, --模板编号 \n" +
+                    "        b.spcshw AS spcshw, --稿袋号 \n" +
+                    "        d.fsizel AS fsizel, --长用料表达式 \n" +
+                    "        d.fsizew AS fsizew, --宽用料表达式 \n" +
+                    "        d.ssizel AS ssizel, --长用料 \n" +
+                    "        d.ssizew AS ssizew, --宽用料 \n" +
+                    "        d.makeupl AS makeupl, --长拼版 \n" +
+                    "        d.makeupw AS makeupw, --宽平版 \n" +
+                    "        d.infixl AS infixl, --长刀缝 \n" +
+                    "        d.infixw AS infixw, --宽刀缝 \n" +
+                    "        d.msizel AS msizel, --长模板 \n" +
+                    "        d.msizew AS msizew, --宽模板 \n" +
+                    "        d.gripl1 AS gripl1, --长叼口1 \n" +
+                    "        d.gripw1 AS gripw1, --宽叼口1 \n" +
+                    "        d.gripl2 AS gripl2, \n" +
+                    "        d.gripw2 AS gripw2, \n" +
+                    "        d.vsizel AS vsizel, --印张尺寸长 \n" +
+                    "        d.vsizew AS vsizew, --印张尺寸宽 \n" +
+                    "        d.fringl AS fringl, --纸板尺寸 \n" +
+                    "        d.fringw AS fringw, --纸板尺寸 \n" +
+                    "        d.splitl AS splitl, --分切长 \n" +
+                    "        d.splitw AS splitw, --分切宽 \n" +
+                    "        d.bleedl AS bleedl, --修边长 \n" +
+                    "        d.bleedw AS bleedw, --修边宽 \n" +
+                    "        d.bsizel AS bsizel, --切长 \n" +
+                    "        d.bwidth AS bwidth, --纸幅 \n" +
+                    "        b.maktyp AS maktyp, --打订方式 \n" +
+                    "        (SELECT i.typnme FROM pb_type i WHERE i.orgcde=t.orgcde AND i.typcde=b.typcde AND ROWNUM=1) AS FCPXX,  --箱型 t.typnme\n" +
+                    "        b.matcde AS FCZ,   --材质\n" +
+                    "        b.crrcde AS FKX,  --坑型\n" +
+                    "        t.accnum AS FSECQTY, --数量,\n" +
+                    "        (CASE t.objtyp WHEN 'CB' THEN ROUND(b.pacreage,6) ELSE ROUND(b.acreage,6) END) AS FHSL, --单个面积,t.acreage\n" +
+                    "        (CASE T.OBJTYP \n" +
+                    "            WHEN 'CB' THEN ROUND(t.accnum * ROUND(b.pacreage,6),6)\n" +
+                    "            ELSE ROUND(t.accnum * ROUND(b.acreage,6),6)\n" +
+                    "            END)  AS FAUXQTY, -- 合计面积, t.sumacr\n" +
+                    "        t.prices AS FPRICE, --单价,\n" +
+                    "        t.inprice AS FSquarePrice,-- 平方价\n" +
+                    "        --t.accamt AS FAMOUNT,--金额,\n" +
+                    "        (CASE t.objtyp WHEN 'CB' THEN ROUND(ROUND(t.accnum * ROUND(b.pacreage,6),6) * t.inprice,2) \n" +
+                    "            ELSE t.accamt \n" +
+                    "            END) AS FAMOUNT,--金额,\n" +
+                    "        d.fringl || 'x' || d.fringw AS FZBCC,--纸板尺寸,\n" +
+                    "        b.ctpono AS FPO,  --客户PONO\n" +
+                    "        ROUND(t.accnum * b.acreage *\n" +
+                    "            (SELECT i.ratios\n" +
+                    "                FROM pb_corrugate i\n" +
+                    "                WHERE i.clientid = t.clientid\n" +
+                    "                AND i.orgcde = t.orgcde\n" +
+                    "                AND i.crrcde = b.crrcde),0)  AS FBZMJ, -- 折算面积\n" +
+                    "        --b.osizel || '*' || b.osizew || '*' || b.osizeh FCKG,   -- 规格\n" +
+                    "        CASE t.objtyp \n" +
+                    "            WHEN 'CB' THEN  '平板' || ' ' || REPLACE(b.spcshw, 'x', '*')\n" +
+                    "            ELSE  b.cspecs || ' ' || REPLACE(t.specs, 'x', '*')\n" +
+                    "            END FCKG,   -- 规格 \n" +
+                    "        b.cspecs AS FPricingSize, -- 计价尺寸\n" +
+                    "        t.specs AS fcustsize,--t.specs 客户规格\n" +
+                    "        t.created AS fdate --时间\n" +
+                    "       ,'N' AS issync\n" +
+                    "       ,c.status\n" +
+                    "       ,b.address AS FDeliveryAddress\n" +
+                    "       ,(SELECT i.distance FROM pb_clnt_addr i WHERE i.clientid = t.clientid AND i.orgcde=t.orgcde AND i.clntcde=t.clntcde AND i.address=b.address AND ROWNUM=1 ) AS fkm\n" +
+                    "       ,(SELECT i.contact FROM pb_clnt_addr i WHERE i.clientid = t.clientid AND i.orgcde=t.orgcde AND i.clntcde=t.clntcde AND i.address=b.address AND ROWNUM=1 ) AS FContactPerson  --联系人\n" +
+                    "       ,(SELECT i.mobile FROM pb_clnt_addr i WHERE i.clientid = t.clientid AND i.orgcde=t.orgcde AND i.clntcde=t.clntcde AND i.address=b.address AND ROWNUM=1 ) AS  FContactNumber  --联系方式\n" +
+                    "       ,(CASE WHEN t.orgcde = '05' AND t.objtyp = 'CB' THEN '三期2.8米生产线'\n" +
+                    "            WHEN t.orgcde = '05' AND t.objtyp <> 'CB' THEN '三期水印联动线组'\n" +
+                    "            WHEN t.orgcde = '03' AND t.objtyp = 'CL' THEN '胶印车间'\n" +
+                    "            WHEN t.orgcde = '03' AND t.objtyp IN ('CC','CD','CT') THEN '水印车间'\n" +
+                    "            WHEN t.orgcde = '03' AND t.objtyp = 'CB' THEN \n" +
+                    "                (SELECT (CASE WHEN a.maccde = '1' THEN '七层生产线'\n" +
+                    "                    WHEN a.maccde = '3' THEN '一期2.5米新生产线'\n" +
+                    "                    WHEN a.maccde = '5' THEN '二层生产线'\n" +
+                    "                    END) \n" +
+                    "                    FROM  ord_processes a WHERE a.orgcde=t.orgcde AND a.serial=t.serial AND prctyp='01' AND ROWNUM=1)\n" +
+                    "            END)  FDeliveryDept   -- 交货单位\n" +
+                    "       ,b.ctpono || ' ' || b.sendrk  FNote   --送货备注\n" +
+                    "       ,(SELECT i.shdate FROM ord_ct_dat i WHERE i.orgcde=t.orgcde AND i.serial=t.serial AND ROWNUM=1) FDeliveryDate  --交货日期\n" +
+                    "       ,(SELECT i.smpnme FROM pb_clnt i WHERE i.orgcde=t.orgcde AND i.clntcde=t.clntcde AND ROWNUM=1) FCustShortName  --客户简称\n" +
+                    "FROM ord_bas t \n" +
+                    "    LEFT JOIN ord_ct b ON b.clientid=t.clientid AND b.orgcde=t.orgcde AND b.serial=t.serial\n" +
+                    "    LEFT JOIN ord_ct_sts c ON c.clientid=t.clientid AND c.orgcde=t.orgcde AND c.serial=t.serial\n" +
+                    "    LEFT JOIN ord_ct_cal d ON d.clientid=t.clientid AND d.orgcde=t.orgcde AND d.serial=t.serial \n" +
+                    "WHERE t.updated>sysdate-1";
+
+            ResultSet rs = stat.executeQuery(sql);
+            List<Map<String, String>> maps = ConnectionUtil.resultSetToList(rs);
+
+//            List<OrderDetail> data = orderMapper.findData(formattedTime,dateString);
 //            OrderDetail orderDetail = data.get(1);
-            for (OrderDetail orderDetail: data) {
-            log.info("orderDetail: "+orderDetail.toString());
+            for (Map orderDetailMap: maps) {
+            log.info("orderDetailMap: "+orderDetailMap.toString());
+            String fBillNo = (String) orderDetailMap.get("FBILLNO"); // 订单号
+
+
 
             Form form=new Form();
             DataEntity  dataEntity=new DataEntity();
@@ -103,87 +240,174 @@ public class OderService {
             dataEntity.setIgnoreInterationFlag("");
             dataEntity.setModel(saleBillForm);
 
-            String s = orderDetail.toString();
+                // 从Map中获取各个值
+                String id = (String) orderDetailMap.get("ID"); // 订单ID
+                String fFactory = (String) orderDetailMap.get("FFACTORY"); // 厂区 (通过orgcde解码得到)
+                if (!fFactory.equals("大溪老厂")){
+                    continue;
+                }
+                String fGxStatus = (String) orderDetailMap.get("FGXSTATUS"); // 订单状态 (此处固定为'U')
+                String chang = (String) orderDetailMap.get("LENGTH"); // 长
+                String kuan = (String) orderDetailMap.get("WIDE"); // 宽
+                String gao = (String) orderDetailMap.get("HIGH"); // 高
+                String yx = (String) orderDetailMap.get("YX"); // 压线
+                String fBjBillNo = (String) orderDetailMap.get("FBJBILLNO"); // 报价单号
+                String fFf = (String) orderDetailMap.get("FFF"); // 门幅宽度
+                String fGxDate = (String) orderDetailMap.get("FGXDATE"); // 最后修改日期
+                String fKhNumber = (String) orderDetailMap.get("FKHNUMBER"); // 客户编号
+                String fKhName = (String) orderDetailMap.get("FKHNAME"); // 客户名称
+                String fKhYwyName = (String) orderDetailMap.get("FKHYWYNAME"); // 客户业务员名称
+                String fYwyNumber = (String) orderDetailMap.get("FYWYNUMBER"); // 销售员编号
+                String fYwyName = (String) orderDetailMap.get("FYWYNAME"); // 销售员名称
+                String fCplx = (String) orderDetailMap.get("FCPLX"); // 品牌类型
+                String wlmc = (String) orderDetailMap.get("WLMC"); // 产品名称---如果没有这个物料需要新增
+                String fCpxx = (String) orderDetailMap.get("FCPXX"); // 箱型名称
+                String fCz = (String) orderDetailMap.get("FCZ"); // 材质代码
+                String fKx = (String) orderDetailMap.get("FKX"); // 坑型代码(楞型编码)
+                String ddlx = (String) orderDetailMap.get("DDLX"); // 订单类型
+                String brand = (String) orderDetailMap.get("BRAND");// 品牌
+                String colnum = (String) orderDetailMap.get("COLNUM");// 色数
+                String spcnum = (String) orderDetailMap.get("SPCNUM");// 专色数
+                String ctlnum = (String) orderDetailMap.get("CTLNUM");// 数量控制
+                String tmpcde = (String) orderDetailMap.get("TMPCDE");// 模板编号
+                String spcshw = (String) orderDetailMap.get("SPCSHW");// 稿袋号
+                String fsizel = (String) orderDetailMap.get("FSIZEL");// 长用料表达式
+                String fsizew = (String) orderDetailMap.get("FSIZEW");// 宽用料表达式
+                String tptype = (String) orderDetailMap.get("TPTYPE");// 模板类型
+                String maktyp = (String) orderDetailMap.get("MAKTYP");// 打订方式
+                String ssizel = (String) orderDetailMap.get("SSIZEL"); // 长用料相关值获取并赋值给ssizel变量
+                String ssizew = (String) orderDetailMap.get("SSIZEW"); // 宽用料相关值获取并赋值给ssizew变量
+                String makeupl = (String) orderDetailMap.get("MAKEUPL"); // 长拼版相关值获取并赋值给makeupl变量
+                String makeupw = (String) orderDetailMap.get("MAKEUPW"); // 宽平版相关值获取并赋值给makeupw变量
+                String infixl = (String) orderDetailMap.get("INFIXL"); // 长刀缝相关值获取并赋值给infixl变量
+                String infixw = (String) orderDetailMap.get("INFIXW"); // 宽刀缝相关值获取并赋值 给infixw变量
+                String msizel = (String) orderDetailMap.get("MSIZEL"); // 长模板相关值获取并赋值给msizel变量
+                String msizew = (String) orderDetailMap.get("MSIZEW"); // 宽模板相关值获取并赋值给msizew变量
+                String gripl1 = (String) orderDetailMap.get("GRIPL1"); // 长叼口1相关值获取并赋值给gripl1变量
+                String gripw1 = (String) orderDetailMap.get("GRIPW1"); // 宽叼口1相关值获取并赋值给gripw1变量
+                String gripl2 = (String) orderDetailMap.get("GRIPL2"); // 长叼口2相关值获取并赋值给gripl2变量
+                String gripw2 = (String) orderDetailMap.get("GRIPW2"); // 宽叼口2相关值获取并赋值给gripw2变量
+                String vsizel = (String) orderDetailMap.get("VSIZEL"); // 印张尺寸长相关值获取并赋值给vsizel变量
+                String vsizew = (String) orderDetailMap.get("VSIZEW"); // 印张尺寸宽相关值获取并赋值给vsizew变量
+                String fringl = (String) orderDetailMap.get("FRINGL"); // 纸板尺寸相关值获取并赋值给fringl变量
+                String fringw = (String) orderDetailMap.get("FRINGW"); // 纸板尺寸相关值获取并赋值给fringw变量
+                String splitl = (String) orderDetailMap.get("SPLITL"); // 分切长相关值获取并赋值给splitl变量
+                String splitw = (String) orderDetailMap.get("SPLITW"); // 分切宽相关值获取并赋值给splitw变量
+                String bleedl = (String) orderDetailMap.get("BLEEDL"); // 修边长相关值获取并赋值给bleedl变量
+                String bleedw = (String) orderDetailMap.get("BLEEDW"); // 修边宽相关值获取并赋值给bleedw变量
+                String bsizel = (String) orderDetailMap.get("BSIZEL"); // 切长相关值获取并赋值给bsizel变量
+                String bwidth = (String) orderDetailMap.get("BSIZEL"); // 纸幅
+
+                String fSecQty = (String) orderDetailMap.get("FSECQTY"); // 订单数量
+//                String fHsl = (String) orderDetailMap.get("FHSL"); // 单个产品面积
+                BigDecimal fHsl;
+                if (orderDetailMap.get("FHSL") == null) {
+                    // 根据业务需求设置默认值，这里假设默认值为0
+                    fHsl = new BigDecimal(0);
+                } else {
+                    fHsl = new BigDecimal((String) orderDetailMap.get("FHSL"));
+                }
+                String fAuxQty = (String) orderDetailMap.get("FAUXQTY"); // 总面积
+                String fPrice = (String) orderDetailMap.get("FPRICE"); // 单价
+                String fSquarePrice = (String) orderDetailMap.get("FSQUAREPRICE"); // 平方米价格
+                String fAmount = (String) orderDetailMap.get("FAMOUNT"); // 金额
+                String fzbcc = (String) orderDetailMap.get("FZBCC"); // 纸板尺寸
+                String fPo = (String) orderDetailMap.get("FPO"); // 客户订单号
+                String fbzmj = (String) orderDetailMap.get("FBZMJ"); // 折算面积
+                String fCkg = (String) orderDetailMap.get("FCKG"); // 规格
+                String fPricingSize = (String) orderDetailMap.get("FPRICINGSIZE"); // 计价尺寸
+                String fCustSize = (String) orderDetailMap.get("FCUSTSIZE"); // 客户规格
+                String fDate = (String) orderDetailMap.get("FDATE"); // 创建日期
+                String issync = (String) orderDetailMap.get("ISSYNC"); // 同步标志
+                String status = (String) orderDetailMap.get("STATUS"); // 订单状态
+                String fDeliveryAddress = (String) orderDetailMap.get("FDELIVERYADDRESS"); // 送货地址
+                String fKm = (String) orderDetailMap.get("FKM"); // 距 离
+                String fContactPerson = (String) orderDetailMap.get("FCONTACTPERSON"); // 联系人
+                String fContactNumber = (String) orderDetailMap.get("FCONTACTNUMBER"); // 联系电话
+                String fDeliveryDept = (String) orderDetailMap.get("FDELIVERYDEPT"); // 交货部门
+                String fNote = (String) orderDetailMap.get("FNOTE"); // 备注
+                String fDeliveryDate = (String) orderDetailMap.get("FDELIVERYDATE"); // 交货日期
+                String fCustShortName = (String) orderDetailMap.get("FCUSTSHORTNAME"); // 客户简称
+            
             // 假设这是在一个Java方法内部，orderDetail是一个已经填充了数据的对象
-            Integer id = orderDetail.getId(); // 订单ID
-            String fFactory = orderDetail.getFFactory(); // 厂区 (通过orgcde解码得到)
-            String fGxStatus = orderDetail.getFGXSTATUS(); // 订单状态 (此处固定为'U')
-            String fBillNo = orderDetail.getFBILLNO(); // 订单号
-            String chang = orderDetail.getLength(); // 长
-            String kuan = orderDetail.getWide(); // 宽
-            String gao = orderDetail.getHigh(); // 高
-            String yx = orderDetail.getYx(); // 压线
-            String fBjBillNo = orderDetail.getFBJBILLNO(); // 报价单号
-            BigDecimal fFf = orderDetail.getFFF(); // 门幅宽度
-            Timestamp fGxDate = orderDetail.getFGXDATE(); // 最后修改日期
-            String fKhNumber = orderDetail.getFKHNUMBER(); // 客户编号
-            String fKhName = orderDetail.getFKHNAME(); // 客户名称
-            String fKhYwyName = orderDetail.getFKHYWYName(); // 客户业务员名称
-            String fYwyNumber = orderDetail.getFYWYNUMBER(); // 销售员编号
-            String fYwyName = orderDetail.getFYWYNAME(); // 销售员名称
-            String fCplx = orderDetail.getFCPLX(); // 品牌类型
-            String wlmc = orderDetail.getWLMC(); // 产品名称---如果没有这个物料需要新增
-            String fCpxx = orderDetail.getFCPXX(); // 箱型名称
-            String fCz = orderDetail.getFCZ(); // 材质代码
-            String fKx = orderDetail.getFKX(); // 坑型代码(楞型编码)
-            String ddlx = orderDetail.getDdlx(); // 订单类型
-            String brand = orderDetail.getBrand();// 品牌
-            String colnum = orderDetail.getColnum();// 色数
-            String spcnum = orderDetail.getSpcnum();// 专色数
-            String ctlnum = orderDetail.getCtlnum();// 数量控制
-            String tmpcde = orderDetail.getTmpcde();// 模板编号
-            String spcshw = orderDetail.getSpcshw();// 稿袋号
-            String fsizel = orderDetail.getFsizel();// 长用料表达式
-            String fsizew = orderDetail.getFsizew();// 宽用料表达式
-            String tptype = orderDetail.getTptype();// 模板类型
-            String maktyp = orderDetail.getMaktyp();// 打订方式
-
-            String ssizel = orderDetail.getSsizel(); // 长用料相关值获取并赋值给ssizel变量
-            String ssizew = orderDetail.getSsizew(); // 宽用料相关值获取并赋值给ssizew变量
-            String makeupl = orderDetail.getMakeupl(); // 长拼版相关值获取并赋值给makeupl变量
-            String makeupw = orderDetail.getMakeupw(); // 宽平版相关值获取并赋值给makeupw变量
-            String infixl = orderDetail.getInfixl(); // 长刀缝相关值获取并赋值给infixl变量
-            String infixw = orderDetail.getInfixw(); // 宽刀缝相关值获取并赋值给infixw变量
-            String msizel = orderDetail.getMSIZEL(); // 长模板相关值获取并赋值给msizel变量
-            String msizew = orderDetail.getMSIZEW(); // 宽模板相关值获取并赋值给msizew变量
-            String gripl1 = orderDetail.getGripl1(); // 长叼口1相关值获取并赋值给gripl1变量
-            String gripw1 = orderDetail.getGripw1(); // 宽叼口1相关值获取并赋值给gripw1变量
-            String gripl2 = orderDetail.getGripl2(); // 长叼口2相关值获取并赋值给gripl2变量
-            String gripw2 = orderDetail.getGripw2(); // 宽叼口2相关值获取并赋值给gripw2变量
-            String vsizel = orderDetail.getVsizel(); // 印张尺寸长相关值获取并赋值给vsizel变量
-            String vsizew = orderDetail.getVsizew(); // 印张尺寸宽相关值获取并赋值给vsizew变量
-            String fringl = orderDetail.getFringl(); // 纸板尺寸相关值获取并赋值给fringl变量
-            String fringw = orderDetail.getFringw(); // 纸板尺寸相关值获取并赋值给fringw变量
-            String splitl = orderDetail.getSplitl(); // 分切长相关值获取并赋值给splitl变量
-            String splitw = orderDetail.getSplitw(); // 分切宽相关值获取并赋值给splitw变量
-            String bleedl = orderDetail.getBleedl(); // 修边长相关值获取并赋值给bleedl变量
-            String bleedw = orderDetail.getBleedw(); // 修边宽相关值获取并赋值给bleedw变量
-            String bsizel = orderDetail.getBsizel(); // 切长相关值获取并赋值给bsizel变量
-            String bwidth = orderDetail.getBsizel(); // 纸幅
-
-            Integer fSecQty = orderDetail.getFSECQTY(); // 订单数量
-            BigDecimal fHsl = orderDetail.getFHSL(); // 单个产品面积
-            BigDecimal fAuxQty = orderDetail.getFAUXQTY(); // 总面积
-            BigDecimal fPrice = orderDetail.getFPRICE(); // 单价
-            BigDecimal fSquarePrice = orderDetail.getFSquarePrice(); // 平方米价格
-            BigDecimal fAmount = orderDetail.getFAMOUNT(); // 金额
-            String fzbcc = orderDetail.getFZBCC(); // 纸板尺寸
-            String fPo = orderDetail.getFPO(); // 客户订单号
-            Integer fbzmj = orderDetail.getFBZMJ(); // 折算面积
-            String fCkg = orderDetail.getFCKG(); // 规格
-            String fPricingSize = orderDetail.getFPricingSize(); // 计价尺寸
-            String fCustSize = orderDetail.getFcustsize(); // 客户规格
-            Timestamp fDate = orderDetail.getFdate(); // 创建日期
-            String issync = orderDetail.getIssync(); // 同步标志
-            String status = orderDetail.getStatus(); // 订单状态
-            String fDeliveryAddress = orderDetail.getFDeliveryAddress(); // 送货地址
-            Integer fKm = orderDetail.getFkm(); // 距离
-            String fContactPerson = orderDetail.getFContactPerson(); // 联系人
-            String fContactNumber = orderDetail.getFContactNumber(); // 联系电话
-            String fDeliveryDept = orderDetail.getFDeliveryDept(); // 交货部门
-            String fNote = orderDetail.getFNote(); // 备注
-            Timestamp fDeliveryDate = orderDetail.getFDeliveryDate(); // 交货日期
-            String fCustShortName = orderDetail.getFCustShortName(); // 客户简称
+//            Integer id = orderDetail.getId(); // 订单ID
+//            String fFactory = orderDetail.getFFactory(); // 厂区 (通过orgcde解码得到)
+//            String fGxStatus = orderDetail.getFGXSTATUS(); // 订单状态 (此处固定为'U')
+//            String fBillNo = orderDetail.getFBILLNO(); // 订单号
+//            String chang = orderDetail.getLength(); // 长
+//            String kuan = orderDetail.getWide(); // 宽
+//            String gao = orderDetail.getHigh(); // 高
+//            String yx = orderDetail.getYx(); // 压线
+//            String fBjBillNo = orderDetail.getFBJBILLNO(); // 报价单号
+//            BigDecimal fFf = orderDetail.getFFF(); // 门幅宽度
+//            Timestamp fGxDate = orderDetail.getFGXDATE(); // 最后修改日期
+//            String fKhNumber = orderDetail.getFKHNUMBER(); // 客户编号
+//            String fKhName = orderDetail.getFKHNAME(); // 客户名称
+//            String fKhYwyName = orderDetail.getFKHYWYName(); // 客户业务员名称
+//            String fYwyNumber = orderDetail.getFYWYNUMBER(); // 销售员编号
+//            String fYwyName = orderDetail.getFYWYNAME(); // 销售员名称
+//            String fCplx = orderDetail.getFCPLX(); // 品牌类型
+//            String wlmc = orderDetail.getWLMC(); // 产品名称---如果没有这个物料需要新增
+//            String fCpxx = orderDetail.getFCPXX(); // 箱型名称
+//            String fCz = orderDetail.getFCZ(); // 材质代码
+//            String fKx = orderDetail.getFKX(); // 坑型代码(楞型编码)
+//            String ddlx = orderDetail.getDdlx(); // 订单类型
+//            String brand = orderDetail.getBrand();// 品牌
+//            String colnum = orderDetail.getColnum();// 色数
+//            String spcnum = orderDetail.getSpcnum();// 专色数
+//            String ctlnum = orderDetail.getCtlnum();// 数量控制
+//            String tmpcde = orderDetail.getTmpcde();// 模板编号
+//            String spcshw = orderDetail.getSpcshw();// 稿袋号
+//            String fsizel = orderDetail.getFsizel();// 长用料表达式
+//            String fsizew = orderDetail.getFsizew();// 宽用料表达式
+//            String tptype = orderDetail.getTptype();// 模板类型
+//            String maktyp = orderDetail.getMaktyp();// 打订方式
+//            String ssizel = orderDetail.getSsizel(); // 长用料相关值获取并赋值给ssizel变量
+//            String ssizew = orderDetail.getSsizew(); // 宽用料相关值获取并赋值给ssizew变量
+//            String makeupl = orderDetail.getMakeupl(); // 长拼版相关值获取并赋值给makeupl变量
+//            String makeupw = orderDetail.getMakeupw(); // 宽平版相关值获取并赋值给makeupw变量
+//            String infixl = orderDetail.getInfixl(); // 长刀缝相关值获取并赋值给infixl变量
+//            String infixw = orderDetail.getInfixw(); // 宽刀缝相关值获取并赋值给infixw变量
+//            String msizel = orderDetail.getMSIZEL(); // 长模板相关值获取并赋值给msizel变量
+//            String msizew = orderDetail.getMSIZEW(); // 宽模板相关值获取并赋值给msizew变量
+//            String gripl1 = orderDetail.getGripl1(); // 长叼口1相关值获取并赋值给gripl1变量
+//            String gripw1 = orderDetail.getGripw1(); // 宽叼口1相关值获取并赋值给gripw1变量
+//            String gripl2 = orderDetail.getGripl2(); // 长叼口2相关值获取并赋值给gripl2变量
+//            String gripw2 = orderDetail.getGripw2(); // 宽叼口2相关值获取并赋值给gripw2变量
+//            String vsizel = orderDetail.getVsizel(); // 印张尺寸长相关值获取并赋值给vsizel变量
+//            String vsizew = orderDetail.getVsizew(); // 印张尺寸宽相关值获取并赋值给vsizew变量
+//            String fringl = orderDetail.getFringl(); // 纸板尺寸相关值获取并赋值给fringl变量
+//            String fringw = orderDetail.getFringw(); // 纸板尺寸相关值获取并赋值给fringw变量
+//            String splitl = orderDetail.getSplitl(); // 分切长相关值获取并赋值给splitl变量
+//            String splitw = orderDetail.getSplitw(); // 分切宽相关值获取并赋值给splitw变量
+//            String bleedl = orderDetail.getBleedl(); // 修边长相关值获取并赋值给bleedl变量
+//            String bleedw = orderDetail.getBleedw(); // 修边宽相关值获取并赋值给bleedw变量
+//            String bsizel = orderDetail.getBsizel(); // 切长相关值获取并赋值给bsizel变量
+//            String bwidth = orderDetail.getBsizel(); // 纸幅
+//
+//            Integer fSecQty = orderDetail.getFSECQTY(); // 订单数量
+//            BigDecimal fHsl = orderDetail.getFHSL(); // 单个产品面积
+//            BigDecimal fAuxQty = orderDetail.getFAUXQTY(); // 总面积
+//            BigDecimal fPrice = orderDetail.getFPRICE(); // 单价
+//            BigDecimal fSquarePrice = orderDetail.getFSquarePrice(); // 平方米价格
+//            BigDecimal fAmount = orderDetail.getFAMOUNT(); // 金额
+//            String fzbcc = orderDetail.getFZBCC(); // 纸板尺寸
+//            String fPo = orderDetail.getFPO(); // 客户订单号
+//            Integer fbzmj = orderDetail.getFBZMJ(); // 折算面积
+//            String fCkg = orderDetail.getFCKG(); // 规格
+//            String fPricingSize = orderDetail.getFPricingSize(); // 计价尺寸
+//            String fCustSize = orderDetail.getFcustsize(); // 客户规格
+//            Timestamp fDate = orderDetail.getFdate(); // 创建日期
+//            String issync = orderDetail.getIssync(); // 同步标志
+//            String status = orderDetail.getStatus(); // 订单状态
+//            String fDeliveryAddress = orderDetail.getFDeliveryAddress(); // 送货地址
+//            Integer fKm = orderDetail.getFkm(); // 距离
+//            String fContactPerson = orderDetail.getFContactPerson(); // 联系人
+//            String fContactNumber = orderDetail.getFContactNumber(); // 联系电话
+//            String fDeliveryDept = orderDetail.getFDeliveryDept(); // 交货部门
+//            String fNote = orderDetail.getFNote(); // 备注
+//            Timestamp fDeliveryDate = orderDetail.getFDeliveryDate(); // 交货日期
+//            String fCustShortName = orderDetail.getFCustShortName(); // 客户简称
 
             saleBillForm.setFBillNo(fBillNo);//订单号--单据编号
             saleBillForm.setFDate(fDate.toString());//创建日期--日期
@@ -259,8 +483,8 @@ public class OderService {
             saleEntry.setFMaterialId(new FNumberForm(wlnb));
 //            saleEntry.setFMaterialId(new FNumberForm("01.01.01.095.1.0800"));
 //            saleEntry.setFUnitID(new FNumberForm("kg"));
-            saleEntry.setFQty(fSecQty);//订单数量--销售数量
-                saleEntry.setTaxPrice(fPrice);//单价
+            saleEntry.setFQty(Integer.valueOf(fSecQty));//订单数量--销售数量
+                saleEntry.setTaxPrice(new BigDecimal(fPrice));//单价
             saleEntries.add(saleEntry);
             saleBillForm.setFEntity(saleEntries);
 
@@ -274,13 +498,20 @@ public class OderService {
 //            if(StringUtils.isEmpty(xsynb) ){
 //                sb.append("业务员'"+fYwyName+"'不存在");
 //            }
+                String dataEntityStr = JSON.toJSONString(dataEntity);
 
-
+                JSONArray objects = selectfrom.selectisExist(fBillNo);
+                if (objects.size()>0){//修改单据
+                    Boolean aBoolean = selectfrom.UnAuditAndDelectBill(fBillNo);
+                    if (!aBoolean){
+                        SaveLogeBill("A",fBillNo,dataEntityStr,"单据已在流程无法修改，请手动删除下游单据并删除销售订单",wlmc,fKhName,fYwyName);
+                        continue;
+                    }
+                }
 
             JSONObject jsonObject = kingdeeApi.kingdeeSave(form);
             System.out.println(jsonObject);
             JSONObject jsonObject2 = jsonObject.getJSONObject("Result").getJSONObject("ResponseStatus");
-            String dataEntityStr = JSON.toJSONString(dataEntity);
             if (jsonObject2.getBoolean("IsSuccess")) {
 
             } else {
@@ -315,6 +546,9 @@ public class OderService {
         }
 
     }
+    /*C简单生产退库单
+    B简单生产入库单
+     */
     public void instockData(){
         List<Instok> data = orderMapper.findinstockData();
         for (Instok instok: data) {

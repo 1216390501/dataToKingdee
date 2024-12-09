@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.webapp.entity.Pojo.wsyj.*;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.mybatis.spring.annotation.MapperScan;
 
 import java.util.Date;
@@ -16,6 +14,87 @@ public interface OrderMapper extends BaseMapper<Order> {
     @Select("SELECT address, agntcde, asscde FROM ord_ct WHERE ROWNUM <= #{limit}")
     List<OrderInfo> findAddressAgntcdeAsscdeWithLimit(int limit);
 
+    @Results({
+            @Result(id = true, property = "id", column = "id"),
+            @Result(property = "FFactory", column = "FFactory"),
+            @Result(property = "FGXSTATUS", column = "FGXSTATUS"),
+            @Result(property = "FBILLNO", column = "FBILLNO"),
+            @Result(property = "FBJBILLNO", column = "FBJBILLNO"),
+            @Result(property = "FFF", column = "FFF"),
+            @Result(property = "FGXDATE", column = "FGXDATE"),
+            @Result(property = "FKHNUMBER", column = "FKHNUMBER"),
+            @Result(property = "WLMC", column = "WLMC"),
+            @Result(property = "FKHNAME", column = "FKHNAME"),
+            @Result(property = "FKHYWYName", column = "FKHYWYName"),
+            @Result(property = "FYWYNUMBER", column = "FYWYNUMBER"),
+            @Result(property = "FYWYNAME", column = "FYWYNAME"),
+            @Result(property = "FCPLX", column = "FCPLX"),
+            @Result(property = "FNAME", column = "FNAME"),
+            @Result(property = "high", column = "high"),
+            @Result(property = "length", column = "length"),
+            @Result(property = "wide", column = "wide"),
+            @Result(property = "yx", column = "yx"),
+            @Result(property = "ddlx", column = "ddlx"),
+            @Result(property = "tptype", column = "tptype"),
+            @Result(property = "brand", column = "brand"),
+            @Result(property = "spcnum", column = "spcnum"),
+            @Result(property = "colnum", column = "colnum"),
+            @Result(property = "ctlnum", column = "ctlnum"),
+            @Result(property = "tmpcde", column = "tmpcde"),
+            @Result(property = "spcshw", column = "spcshw"),
+            @Result(property = "fsizel", column = "fsizel"),
+            @Result(property = "fsizew", column = "fsizew"),
+            @Result(property = "ssizel", column = "ssizel"),
+            @Result(property = "ssizew", column = "ssizew"),
+            @Result(property = "makeupl", column = "makeupl"),
+            @Result(property = "makeupw", column = "makeupw"),
+            @Result(property = "infixl", column = "infixl"),
+            @Result(property = "infixw", column = "infixw"),
+            @Result(property = "MSIZEL", column = "MSIZEL"),
+            @Result(property = "MSIZEW", column = "MSIZEW"),
+            @Result(property = "gripl1", column = "gripl1"),
+            @Result(property = "gripw1", column = "gripw1"),
+            @Result(property = "gripl2", column = "gripl2"),
+            @Result(property = "gripw2", column = "gripw2"),
+            @Result(property = "vsizel", column = "vsizel"),
+            @Result(property = "vsizew", column = "vsizew"),
+            @Result(property = "fringl", column = "fringl"),
+            @Result(property = "fringw", column = "fringw"),
+            @Result(property = "splitl", column = "splitl"),
+            @Result(property = "splitw", column = "splitw"),
+            @Result(property = "bleedl", column = "bleedl"),
+            @Result(property = "bleedw", column = "bleedw"),
+            @Result(property = "bsizel", column = "bsizel"),
+            @Result(property = "bwidth", column = "bwidth"),
+            @Result(property = "maktyp", column = "maktyp"),
+            @Result(property = "FCPXX", column = "FCPXX"),
+            @Result(property = "FCZ", column = "FCZ"),
+            @Result(property = "FKX", column = "FKX"),
+            @Result(property = "FSECQTY", column = "FSECQTY"),
+            @Result(property = "FHSL", column = "FHSL"),
+            @Result(property = "FAUXQTY", column = "FAUXQTY"),
+            @Result(property = "FPRICE", column = "FPRICE"),
+            @Result(property = "FSquarePrice", column = "FSquarePrice"),
+            @Result(property = "FAMOUNT", column = "FAMOUNT"),
+            @Result(property = "FZBCC", column = "FZBCC"),
+            @Result(property = "FPO", column = "FPO"),
+            @Result(property = "FBZMJ", column = "FBZMJ"),
+            @Result(property = "FCKG", column = "FCKG"),
+            @Result(property = "FPricingSize", column = "FPricingSize"),
+            @Result(property = "fcustsize", column = "fcustsize"),
+            @Result(property = "fdate", column = "fdate"),
+            @Result(property = "issync", column = "issync"),
+            @Result(property = "status", column = "status"),
+            @Result(property = "FDeliveryAddress", column = "FDeliveryAddress"),
+            @Result(property = "fkm", column = "fkm"),
+            @Result(property = "FContactPerson", column = "FContactPerson"),
+            @Result(property = "FContactNumber", column = "FContactNumber"),
+            @Result(property = "FDeliveryDept", column = "FDeliveryDept"),
+            @Result(property = "FNote", column = "FNote"),
+            @Result(property = "FDeliveryDate", column = "FDeliveryDate"),
+            @Result(property = "FCustShortName", column = "FCustShortName")
+    })
+    @ResultMap("orderDetailResultMap")
     @Select("select t.id,\n" +
             "\t\t\t decode(t.orgcde,'03','温森一期二期','05','温森三期') as FFactory,  --厂区\n" +
             "       'U' as FGXSTATUS,   --t.opmode\n" +

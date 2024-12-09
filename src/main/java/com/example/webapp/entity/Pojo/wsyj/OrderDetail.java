@@ -1,11 +1,17 @@
 package com.example.webapp.entity.Pojo.wsyj;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import javax.persistence.Column;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Data
+
+@TableName(value = "ord_bas", autoResultMap = true)
+//@TableName(value = "tb_orderdetail", autoResultMap = true)
 public class OrderDetail {
 
     private Integer id;
@@ -36,8 +42,10 @@ public class OrderDetail {
     private String spcshw; //稿袋号
     private String fsizel; //长用料表达式
     private String fsizew; //宽用料表达式
-
+    @TableField(value="ssizel", keepGlobalFormat = true)
     private String ssizel; //长用料
+
+    @TableField(value="ssizew", keepGlobalFormat = true)
     private String ssizew; //宽用料
     private String makeupl; //长拼版
     private String makeupw; //宽平版

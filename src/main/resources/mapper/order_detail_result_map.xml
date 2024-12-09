@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.webapp.mapper.OrderMapper">
+
+    <!-- 定义名为orderDetailResultMap的结果映射，用于将数据库查询结果映射到OrderDetail对象 -->
+    <resultMap id="orderDetailResultMap" type="com.example.webapp.entity.Pojo.wsyj.OrderDetail">
+
+        <!-- 将数据库表中的id列映射到OrderDetail对象的id属性，通常用于标识主键 -->
+        <id property="id" column="id"/>
+
+        <!-- 将数据库表中的FFactory列映射到OrderDetail对象的FFactory属性 -->
+        <result property="FFactory" column="FFactory"/>
+
+        <!-- 将数据库表中的FGXSTATUS列映射到OrderDetail对象的FGXSTATUS属性，可能表示某种业务状态 -->
+        <result property="FGXSTATUS" column="FGXSTATUS"/>
+
+        <!-- 将数据库表中的FBILLNO列映射到OrderDetail对象的FBILLNO属性，可能是订单编号 -->
+        <result property="FBILLNO" column="FBILLNO"/>
+
+        <!-- 将数据库表中的FBJBILLNO列映射到OrderDetail对象的FBJBILLNO属性，可能是相关订单编号 -->
+        <result property="FBJBILLNO" column="FBJBILLNO"/>
+
+        <!-- 将数据库表中的FFF列映射到OrderDetail对象的FFF属性 -->
+        <result property="FFF" column="FFF"/>
+
+        <!-- 将数据库表中的FGXDATE列映射到OrderDetail对象的FGXDATE属性，可能是某个业务日期 -->
+        <result property="FGXDATE" column="FGXDATE"/>
+
+        <!-- 将数据库表中的FKHNUMBER列映射到OrderDetail对象的FKHNUMBER属性，可能与客户相关的编号 -->
+        <result property="FKHNUMBER" column="FKHNUMBER"/>
+
+        <!-- 将数据库表中的WLMC列映射到OrderDetail对象的WLMC属性，可能是物品名称 -->
+        <result property="WLMC" column="WLMC"/>
+
+        <!-- 将数据库表中的FKHNAME列映射到OrderDetail对象的FKHNAME属性，可能是客户名称 -->
+        <result property="FKHNAME" column="FKHNAME"/>
+
+        <!-- 将数据库表中的FKHYWYName列映射到OrderDetail对象的FKHYWYName属性，可能是客户业务员名称 -->
+        <result property="FKHYWYName" column="FKHYWYName"/>
+
+        <!-- 将数据库表中的FYWYNUMBER列映射到OrderDetail对象的FYWYNUMBER属性，可能是业务员编号 -->
+        <result property="FYWYNUMBER" column="FYWYNUMBER"/>
+
+        <!-- 将数据库表中的FYWYNAME列映射到OrderDetail对象的FYWYNAME属性，可能是业务员名称 -->
+        <result property="FYWYNAME" column="FYWYNAME"/>
+
+        <!-- 将数据库表中的FCPLX列映射到OrderDetail对象的FCPLX属性，可能是产品类型 -->
+        <result property="FCPLX" column="FCPLX"/>
+
+        <!-- 将数据库表中的FNAME列映射到OrderDetail对象的FNAME属性，可能是名称相关信息 -->
+        <result property="FNAME" column="FNAME"/>
+
+        <!-- 将数据库表中的high列映射到OrderDetail对象的high属性，可能是高度相关信息 -->
+        <result property="high" column="high"/>
+
+        <!-- 将数据库表中的length列映射到OrderDetail对象的length属性，可能是长度相关信息 -->
+        <result property="length" column="length"/>
+
+        <!-- 将数据库表中的wide列映射到OrderDetail对象的wide属性，可能是宽度相关信息 -->
+        <result property="wide" column="wide"/>
+
+        <!-- 将数据库表中的yx列映射到OrderDetail对象的yx属性，具体含义需根据业务确定 -->
+        <result property="yx" column="yx"/>
+
+        <!-- 将数据库表中的ddlx列映射到OrderDetail对象的ddlx属性，具体含义需根据业务确定 -->
+        <result property="ddlx" column="ddlx"/>
+
+        <!-- 将数据库表中的tptype列映射到OrderDetail对象的tptype属性，可能是某种类型信息 -->
+        <result property="tptype" column="tptype"/>
+
+        <!-- 将数据库表中的brand列映射到OrderDetail对象的brand属性，可能是品牌相关信息 -->
+        <result property="brand" column="brand"/>
+
+        <!-- 将数据库表中的spcnum列映射到OrderDetail对象的spcnum属性，具体含义需根据业务确定 -->
+        <result property="spcnum" column="spcnum"/>
+
+        <!-- 将数据库表中的colnum列映射到OrderDetail对象的colnum属性，具体含义需根据业务确定 -->
+        <result property="colnum" column="colnum"/>
+
+        <!-- 将数据库表中的ctlnum列映射到OrderDetail对象的ctlnum属性，具体含义需根据业务确定 -->
+        <result property="ctlnum" column="ctlnum"/>
+
+        <!-- 将数据库表中的tmpcde列映射到OrderDetail对象的tmpcde属性，具体含义需根据业务确定 -->
+        <result property="tmpcde" column="tmpcde"/>
+
+        <!-- 将数据库表中的spcshw列映射到OrderDetail对象的spcshw属性，具体含义需根据业务确定 -->
+        <result property="spcshw" column="spcshw"/>
+
+        <!-- 将数据库表中的fsizel列映射到OrderDetail对象的fsizel属性，可能是尺寸相关信息 -->
+        <result property="fsizel" column="fsizel"/>
+
+        <!-- 将数据库表中的fsizew列映射到OrderDetail对象的fsizew属性，可能是尺寸相关信息 -->
+        <result property="fsizew" column="fsizew"/>
+
+        <!-- 将数据库表中的ssizel列映射到OrderDetail对象的ssizel属性，可能是尺寸相关信息 -->
+        <result property="ssizel" column="ssizel"/>
+
+        <!-- 将数据库表中的ssizew列映射到OrderDetail对象的ssizew属性，可能是尺寸相关信息 -->
+        <result property="ssizew" column="ssizew"/>
+
+        <!-- 将数据库表中的makeupl列映射到OrderDetail对象的makeupl属性，可能是妆容相关信息（具体需根据业务） -->
+        <result property="makeupl" column="makeupl"/>
+
+        <!-- 将数据库表中的makeupw列映射到OrderDetail对象的makeupw属性，可能是妆容相关信息（具体需根据业务） -->
+        <result property="makeupw" column="makeupw"/>
+
+        <!-- 将数据库表中的infixl列映射到OrderDetail对象的infixl属性，具体含义需根据业务确定 -->
+        <result property="infixl" column="infixl"/>
+
+        <!-- 将数据库表中的infixw列映射到OrderDetail对象的infixw属性，具体含义需根据业务确定 -->
+        <result property="infixw" column="infixw"/>
+
+        <!-- 将数据库表中的MSIZEL列映射到OrderDetail对象的MSIZEL属性，可能是尺寸相关信息 -->
+        <result property="MSIZEL" column="MSIZEL"/>
+
+        <!-- 将数据库表中的MSIZEW列映射到OrderDetail对象的MSIZEW属性，可能是尺寸相关信息 -->
+        <result property="MSIZEW" column="MSIZEW"/>
+
+        <!-- 将数据库表中的gripl1列映射到OrderDetail对象的gripl1属性，具体含义需根据业务确定 -->
+        <result property="gripl1" column="gripl1"/>
+
+        <!-- 将数据库表中的gripw1列映射到OrderDetail对象的gripw1属性，具体含义需根据业务确定 -->
+        <result property="gripw1" column="gripw1"/>
+
+        <!-- 将数据库表中的gripl2列映射到OrderDetail对象的gripl2属性，具体含义需根据业务确定 -->
+        <result property="gripl2" column="gripl2"/>
+
+        <!-- 将数据库表中的gripw2列 mapping到OrderDetail对象的gripw2属性，具体含义需根据业务确定 -->
+        <result property="gripw2" column="gripw2"/>
+
+        <!-- 将数据库表中的vsizel列 mapping到OrderDetail对象的vsizel属性，可能是尺寸相关信息 -->
+        <result property="vsizel" column="vsizel"/>
+
+        <!-- 将数据库表中的vsizew列 mapping到OrderDetail对象的vsizew属性，可能是尺寸相关相关信息 -->
+        <result property="vsizew" column="vsizew"/>
+
+        <!-- 将数据库表中的fringl列 mapping到OrderDetail对象的fringl属性，具体含义需根据业务确定 -->
+        <result property="fringl" column="fringl"/>
+
+        <!-- 将数据库表中的fringw列 mapping到OrderDetail对象的fringw属性，具体含义需根据业务确定 -->
+        <result property="fringw" column="fringw"/>
+
+        <!-- 将数据库表中的splitl列 mapping到OrderDetail对象的splitl属性，具体含义需根据业务确定 -->
+        <result property="splitl" column="splitl"/>
+
+        <!-- 将数据库表中的splitw列 mapping到OrderDetail对象的splitw属性，具体含义需根据业务确定 -->
+        <result property="splitw" column="splitw"/>
+
+        <!-- 将数据库表中的bleedl列 mapping到OrderDetail对象的bleedl属性，具体含义需根据业务确定 -->
+        <result property="bleedl" column="bleedl"/>
+
+        <!-- 将数据库表中的bleedw列 mapping到OrderDetail对象的bleedw属性，具体含义需根据业务确定 -->
+        <result property="bleedw" column="bleedw"/>
+
+        <!-- 将数据库表中的bsizel列 mapping到OrderDetail对象的bsizel属性，可能是尺寸相关信息 -->
+        <result property="bsizel" column="bsizel"/>
+
+        <!-- 将数据库表中的bwidth列 mapping到OrderDetail对象的bwidth属性，可能是宽度相关信息 -->
+        <result property="bwidth" column="bwidth"/>
+
+        <!-- 将数据库表中的maktyp列 mapping到OrderDetail对象的maktyp属性，具体含义需根据业务确定 -->
+        <result property="maktyp" column="maktyp"/>
+
+        <!-- 将数据库表中的FCPXX列 mapping到OrderDetail对象的FCPXX属性，具体含义需根据业务确定 -->
+        <result property="FCPXX" column="FCPXX"/>
+
+        <!-- 将数据库表中的FCZ列 mapping到OrderDetail对象的FCZ属性，具体含义需根据业务确定 -->
+        <result property="FCZ" column="FCZ"/>
+
+        <!-- 将数据库表中的FKX列 mapping到OrderDetail对象的FKX属性，具体含义需根据业务确定 -->
+        <result property="FKX" column="FKX"/>
+
+        <!-- 将数据库表中的FSECQTY列 mapping到OrderDetail对象的FSECQTY属性，可能是某种数量相关信息 -->
+        <result property="FSECQTY" column="FSECQTY"/>
+
+        <!-- 将数据库表中的FHSL列 mapping到OrderSummary对象的FHSL属性，可能是某种数量相关信息 -->
+        <result property="FHSL" column="FHSL"/>
+
+        <!-- 将数据库表中的FAUXQTY列 mapping到OrderDetail对象的FAUXQTY属性，可能是某种数量相关信息 -->
+        <result property="FAUXQTY" column="FAUXQTY"/>
+
+        <!-- 将数据库表中的FPRICE列 mapping到OrderDetail对象的FPRICE属性，可能是价格相关信息 -->
+        <result property="FPRICE" column="FPRICE"/>
+
+        <!-- 将数据库表中的FSquarePrice列 mapping到OrderDetail对象的FSquarePrice属性，可能是平方价格相关信息 -->
+        <result property="FSquarePrice" column="FSquarePrice"/>
+
+        <!-- 将数据库表中的FAMOUNT列 mapping到OrderDetail对象的FAMOUNT属性，可能是金额相关信息 -->
+        <result property="FAMOUNT" column="FAMOUNT"/>
+
+        <!-- 将数据库表中的FZBCC列 mapping到OrderDetail对象的FZBCC属性，具体含义需根据业务确定 -->
+        <result property="FZBCC" column="FZBCC"/>
+
+        <!-- 将数据库表中的FPO列 mapping到OrderDetail对象的FPO句柄，可能是某种业务相关的标识 -->
+        <result property="FPO" column="FPO"/>
+
+        <!-- 将数据库表中的FBZMJ列 mapping到OrderDetail对象的FBZMJ属性，可能是某种面积相关信息 -->
+        <result property="FBZMJ" column="FBZMJ"/>
+
+        <!-- 将数据库表中的FCKG句柄 mapping到OrderDetail对象的FCKG属性，可能是某种仓库相关的标识 -->
+        <result property="FCKG" column="FCKG"/>
+
+        <!-- 将数据库表中的FPricingSize句柄 mapping到OrderDetail对象的FPricingSize属性，可能是定价尺寸相关的标识 -->
+        <result property="FPricingSize" column="FPricingSize"/>
+
+        <!-- 将数据库表中的fcustsize句柄 mapping到OrderDetail对象的fcustsize属性，可能是客户尺寸相关的标识 -->
+        <result property="fcustsize" column="fcustsize"/>
+
+        <!-- 将数据库表中的fdate句柄 mapping到OrderDetail对象的fdate属性，可能是日期相关的标识 -->
+        <result property="fdate" column="fdate"/>
+
+        <!-- 将数据库表中的issync句柄 mapping到OrderDetail对象的issync属性，可能是同步相关的标识 -->
+        <result property="issync" column="issync"/>
+
+        <!-- 将数据库表中的status句柄 mapping到OrderDetail对象的status属性，可能是状态相关的标识 -->
+        <result property="status" column="status"/>
+
+        <!-- 将数据库表中的FDeliveryAddress句柄 mapping到OrderDetail对象的FDeliveryAddress属性，可能是送货地址相关的标识 -->
+        <result property="FDeliveryAddress" column="FDeliveryAddress"/>
+
+        <!-- 将数据库表中的fkm句柄 mapping到OrderDetail对象的fkm属性，可能是某种相关标识 -->
+        <result property="fkm" column="fkm"/>
+
+        <!-- 将数据库表中的FContactPerson句柄 mapping到OrderDetail对象的FContactPerson属性，可能是联系人相关的标识 -->
+        <result property="FContactPerson" column="FContactPerson"/>
+
+        <!-- 将数据库表中的FContactNumber句柄 mapping到OrderDetail对象的FContactNumber属性，可能是联系电话相关的标识 -->
+        <result property="FContactNumber" column="FContactNumber"/>
+
+        <!-- 将数据库表中的FDeliveryDept句柄 mapping到OrderDetail对象的FDeliveryDept属性，可能是送货部门相关的标识 -->
+        <result property="FDeliveryDept" column="FDeliveryDept"/>
+
+        <!-- 将数据库表中的FNote句柄 mapping到OrderDetail对象的FNote属性，可能是备注相关的标识 -->
+        <result property="FNote" column="FNote"/>
+
+        <!-- 将数据库表中的FDeliveryDate句柄 mapping到OrderDetail对象的FDeliveryDate属性，可能是送货日期相关的标识 -->
+        <result property="FDeliveryDate" column="FDeliveryDate"/>
+
+        <!-- 将数据库表中的FCustShortName句柄 mapping到OrderDetail对象的FCustShortName属性，可能是客户简称相关的标识 -->
+        <result property="FCustShortName" column="FCustShortName"/>
+    </resultMap>
+
+</mapper>

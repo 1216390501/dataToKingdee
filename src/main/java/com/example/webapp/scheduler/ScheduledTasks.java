@@ -43,6 +43,7 @@ public class ScheduledTasks {
     }
 
     @Scheduled(fixedRate = 1000*60*60*24) // 每5秒执行一次
+//    @Scheduled(cron = "0 0 1 * * *")
     public void fetchDataAndSend() throws Exception {
 //        System.out.println("我是输出");
 
