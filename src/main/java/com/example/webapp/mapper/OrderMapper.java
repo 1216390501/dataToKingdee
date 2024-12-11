@@ -292,12 +292,12 @@ public interface OrderMapper extends BaseMapper<Order> {
                     "           and z.serial = t.serial\n" +
                     "           and z.prctyp = '01'\n" +
                     "           and rownum = 1) as proline--生产线\n" +
-//                    "from pb_bcdr_ct t where  rownum<2 "
-                    " from pb_bcdr_ct t where rownum<10 ORDER BY t.created DESC"
+                    " from pb_bcdr_ct t where t.created BETWEEN TO_DATE(#{startdate}, 'YYYY-MM-DD\"T\"HH24:MI:SS') AND TO_DATE(#{enddate}, 'YYYY-MM-DD\"T\"HH24:MI:SS')"
+//                    " from pb_bcdr_ct t where rownum<10 ORDER BY t.created DESC"
 //                    "from pb_bcdr_ct t where  rownum<2 and t.pono='CTRA220117026' ORDER BY t.created DESC"
 //                    "from pb_bcdr_ct t where t.created>sysdate-1  and rownum<110 "
     )
-    List<Instok> findinstockData();
+    List<Instok> findinstockData(@Param("startdate")String startdate, @Param("enddate")String enddate);
 
 
     @Select("SELECT\n" +

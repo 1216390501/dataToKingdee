@@ -6,13 +6,13 @@
 #    password: Aa1216390501ttt
 spring:
   datasource:
-    url: jdbc:oracle:thin:@//36.138.132.30:1521/dbms
-#    url: jdbc:oracle:thin:@//db.00.forestpacking.com:1522/dbms
-    username: read
-    password: ejsh.read
-    driver-class-name: oracle.jdbc.OracleDriver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
+#    url: jdbc:oracle:thin:@//36.138.132.30:1521/dbms
+##    url: jdbc:oracle:thin:@//db.00.forestpacking.com:1522/dbms
+#    username: read
+#    password: ejsh.read
+#    driver-class-name: oracle.jdbc.OracleDriver
+#    hikari:
+#      maximum-pool-size: 10
+#      minimum-idle: 5
   profiles:
     active: uat # 默认使用开发环境配置

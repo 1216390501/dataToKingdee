@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @MapperScan("com.example.webapp.mapper")
-//@ComponentScan("com.example.webapp.service")
+@ComponentScan("com.example.webapp")
 public class WebappApplication {
 
     public static void main(String[] args) {
