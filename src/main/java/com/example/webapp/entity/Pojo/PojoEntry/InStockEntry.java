@@ -19,6 +19,11 @@ public class InStockEntry {
      */
     @JSONField(name = "FMaterialId",ordinal = 1)
     private FNumberForm materialId;
+    /**
+     * Lot批号
+     */
+    @JSONField(name = "FLot",ordinal = 1)
+    private FNumberForm Lot;
 
     /**
      * FRealQty 实收数量
@@ -42,4 +47,14 @@ public class InStockEntry {
      */
     @JSONField(name = "FWorkShopId1",ordinal = 4)
     private FNumberForm workShopId;
+    /**
+     * FProductNo  生产订单
+     */
+    @JSONField(name = "FProductNo",ordinal = 6)
+    private String productNo;
+    /**
+     * Ftechnology  生产订单
+     */
+    @JSONField(name = "Ftechnology",ordinal = 8)
+    private FNumberForm technology;
 }

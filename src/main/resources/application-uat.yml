@@ -64,4 +64,5 @@ kingdee:
   username: Administrator
   password: slbz.2024
   lcid: 2052
-  serverurl: http://localhost//k3cloud/
+  serverurl: http://k3.forestpacking.com/k3cloud/
+#  serverurl: http://localhost//k3cloud/

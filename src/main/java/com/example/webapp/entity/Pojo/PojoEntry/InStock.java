@@ -50,11 +50,7 @@ public class InStock {
     @JSONField(name = "F_boxtype",ordinal = 5)
     private String boxtype;
 
-    /**
-     * F_productNo  生产订单
-     */
-    @JSONField(name = "F_productNo",ordinal = 6)
-    private String productNo;
+
 
     /**
      * F_productLin  生产线

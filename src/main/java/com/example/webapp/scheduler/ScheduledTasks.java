@@ -48,7 +48,7 @@ public class ScheduledTasks {
 //        System.out.println("我是输出");
 
 
-        oderService.findOderData();//销售订单
+//        oderService.findOderData();//销售订单
 //        oderService.instockData();//简单生产入库
 //        oderService.outstockData();//销售出库
         //数据库

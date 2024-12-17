@@ -137,8 +137,11 @@ public class OderService {
                 // 从Map中获取各个值
                 String id = (String) orderDetailMap.get("ID"); // 订单ID
                 String fFactory = (String) orderDetailMap.get("FFACTORY"); // 厂区 (通过orgcde解码得到)
-                if (!fFactory.equals("大溪老厂")){
-                    continue;
+                String org = (String) orderDetailMap.get("ORG"); // 组织
+                if (org.equals("00")){
+                    saleBillForm.setFSaleOrgId(new FNumberForm("100"));
+                }else{
+                    saleBillForm.setFSaleOrgId(new FNumberForm("101"));
                 }
                 String fGxStatus = (String) orderDetailMap.get("FGXSTATUS"); // 订单状态 (此处固定为'U')
                 String chang = (String) orderDetailMap.get("LENGTH"); // 长
@@ -398,7 +401,7 @@ public class OderService {
                 if (objects.size()>0){//修改单据
                     Boolean aBoolean = selectfrom.UnAuditAndDelectBill(fBillNo);
                     if (!aBoolean){
-                        SaveLogeBill("A",fBillNo,dataEntityStr,"单据已在流程无法修改，请手动删除下游单据并删除销售订单",wlmc,fKhName,fYwyName);
+                        SaveLogeBill("A",org,fBillNo,dataEntityStr,"单据已在流程无法修改，请手动删除下游单据并删除销售订单",wlmc,fKhName,fYwyName);
                         continue;
                     }
                 }
@@ -417,7 +420,7 @@ public class OderService {
                     errorList.add(message);
 
                 }
-                SaveLogeBill("A",fBillNo,dataEntityStr,errorList.toString(),wlmc,fKhName,fYwyName);
+                SaveLogeBill("A",org,fBillNo,dataEntityStr,errorList.toString(),wlmc,fKhName,fYwyName);
 //                Form form2=new Form();
 //                ForReastLog forReastLog = new ForReastLog();
 //                DataEntity  dataEntity2=new DataEntity();
@@ -450,7 +453,7 @@ public class OderService {
             Integer id = instok.getId();
             String billno = instok.getFNumber();// 入库单号
             String time = instok.getDDTime();// 单据日期
-            String Orgcde = instok.getOrgcde();// 组织
+            String org = instok.getOrgcde();// 组织
             String clientid = instok.getClientid();// 厂区
             String wlname = instok.getWlName();// 物料名称
             String khName = instok.getKhName();// 客户名称
@@ -476,7 +479,7 @@ public class OderService {
 //            InStockBill.setKu(new FNumberForm("01000001"));//客户
 
             InStockBill.setStockOrgId(new FNumberForm("100"));//组织
-            InStockBill.setProductNo(proNo);//生产订单
+//            InStockBill.setProductNo(proNo);//生产订单
             InStockBill.setBoxtype(type);//类型
             InStockBill.setProductLin(proline);//生产线
             InStockEntry instockentry = new InStockEntry();
@@ -528,9 +531,9 @@ public class OderService {
 
                 }
                 if(qty.compareTo(BigDecimal.ZERO) < 0){
-                    SaveLogeBill("C",billno,dataEntityStr,errorList.toString(),wlname,khName,"");
+                    SaveLogeBill("C",org,billno,dataEntityStr,errorList.toString(),wlname,khName,"");
                 }else {
-                    SaveLogeBill("B",billno,dataEntityStr,errorList.toString(),wlname,khName,"");
+                    SaveLogeBill("B",org,billno,dataEntityStr,errorList.toString(),wlname,khName,"");
                 }
 
 //                List<String> errorList = new ArrayList<>();
@@ -572,7 +575,7 @@ public class OderService {
         for (outstock Outstok: data) {
             Integer id = Outstok.getId();
             String time = Outstok.getDDTime();// 单据日期
-            String Orgcde = Outstok.getOrgcde();// 组织
+            String org = Outstok.getOrgcde();// 组织
             String clientid = Outstok.getClientid();// 厂区
             String khName = Outstok.getKhName();// 客户名称
             String type = Outstok.getType();// 类型
@@ -617,7 +620,7 @@ public class OderService {
                 String wlnb = this.getFNumber("BD_MATERIAL", proName);
                 outStockEntry.setMaterialId(new FNumberForm(wlnb));//产品
 //            outStockEntry.setMaterialId(new FNumberForm(proNo));//产品
-                outStockEntry.setRealQty(amount);
+//                outStockEntry.setRealQty(amount);
                 outStockEntry.setLot(new FNumberForm(batch));
                 outStock.setEntry(Arrays.asList(outStockEntry));
 
@@ -638,7 +641,7 @@ public class OderService {
 
                     }
 
-                    SaveLogeBill("D",pono,dataEntityStr,errorList.toString(),proName,khName,ywyName);
+                    SaveLogeBill("D",org,pono,dataEntityStr,errorList.toString(),proName,khName,ywyName);
 
 
                 }
@@ -727,7 +730,7 @@ public class OderService {
      * @param textLog 同步报文,json数据
      * @param Cause 错误原因
      */
-    public void SaveLogeBill(String billtype ,String SrcNo, String textLog,String Cause,String wlname,String khname,String ywyname){
+    public void SaveLogeBill(String billtype ,String org,String SrcNo, String textLog,String Cause,String wlname,String khname,String ywyname){
         Form form2 = new Form();
         ForReastLog forReastLog = new ForReastLog();
 
@@ -737,6 +740,7 @@ public class OderService {
         form2.setData(dataEntity);
         dataEntity.setModel(forReastLog);
         forReastLog.setBillno(SrcNo);
+        forReastLog.setOrg(org);
         forReastLog.setBillType(billtype);
         forReastLog.setTextLog(textLog);//同步报文
 //        forReastLog.setErrorinfo(Errorinfo);//报错日志

@@ -24,7 +24,7 @@ public class outStockEntry {
      * FRealQty 实发数量
      */
     @JSONField(name = "FRealQty",ordinal = 2)
-    private BigDecimal realQty;
+    private Double realQty;
     /**
      * FStockID  仓库
      */

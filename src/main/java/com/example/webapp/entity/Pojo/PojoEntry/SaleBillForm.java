@@ -27,6 +27,11 @@ public class SaleBillForm {
      */
     @JSONField(name = "FSaleDeptId", ordinal = 2)
     private FNumberForm fSaleDeptId;
+    /**
+     * FSaleOrgId 销售组织
+     */
+    @JSONField(name = "FSaleOrgId", ordinal = 2)
+    private FNumberForm fSaleOrgId;
 
     /**
      * FSalerId 销售员

@@ -21,7 +21,11 @@ public class ForReastLog {
      */
     @JSONField(name = "FBillNo",ordinal = 1)
     private String billno;
-
+    /**
+     * F_ORG组织
+     */
+    @JSONField(name = "F_ORG",ordinal = 1)
+    private String org;
     /**
      * F_BillType
      */

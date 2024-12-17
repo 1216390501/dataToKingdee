@@ -292,7 +292,38 @@ public interface OrderMapper extends BaseMapper<Order> {
                     "           and z.serial = t.serial\n" +
                     "           and z.prctyp = '01'\n" +
                     "           and rownum = 1) as proline--生产线\n" +
-                    " from pb_bcdr_ct t where t.created BETWEEN TO_DATE(#{startdate}, 'YYYY-MM-DD\"T\"HH24:MI:SS') AND TO_DATE(#{enddate}, 'YYYY-MM-DD\"T\"HH24:MI:SS')"
+                    ", case a.ordtyp\n" +
+                    "         when 'CB' then\n" +
+                    "          t.SERIAL || ' ' || '平张' || ' ' || replace(a.spcshw, 'x', '*')\n" +
+                    "         else\n" +
+                    "          t.SERIAL || ' ' || a.cspecs || ' ' || replace(b.SPECS, 'x', '*')\n" +
+                    "       end 批次号\n" +
+                    "\t\t\t ,(case when t.orgcde = '05' and t.objtyp = 'CB' then '三期2.8米生产线'\n" +
+                    "\t\t\t\t\t\t\t when t.orgcde = '05' and t.objtyp <> 'CB' then '三期水印联动线组'\n" +
+                    "\t\t\t\t\t\t\t when t.orgcde = '03' and t.objtyp = 'CL' then '胶印车间'\n" +
+                    "\t\t\t\t\t\t\t when t.orgcde = '03' and t.objtyp in ('CC','CD','CT') then '水印车间'\n" +
+                    "\t\t\t\t\t\t\t when t.orgcde = '03' and t.objtyp = 'CB' then \n" +
+                    "\t\t\t\t\t\t\t\t\t\t\t(select (case when a.maccde = '1' then '七层生产线'\n" +
+                    "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\twhen a.maccde = '3' then '一期2.5米新生产线'\n" +
+                    "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\twhen a.maccde = '5' then '二层生产线'\n" +
+                    "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tend) \n" +
+                    "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n" +
+                    "\t\t\t\t\t\t\t\t\t\t\t\t\t\tfrom  ord_processes a where a.orgcde=t.orgcde and a.serial=t.serial and prctyp='01' and rownum=1)\n" +
+                    "\t\t\t\tend)  bm   -- 交货单位\n" +
+                    "\t\t\t\t,(case when t.orgcde='05' and t.objtyp='CB' then '三期箱片仓库'\n" +
+                    "\t\t\t\t\t\t\twhen t.orgcde='05' and t.OBJTYP <> 'CB' then '三期纸箱仓库'\n" +
+                    "\t\t\t\t\t\t\twhen t.orgcde = '03' and t.objtyp = 'CB' then '一期箱片仓库'\n" +
+                    "\t\t\t\t\t\t\twhen t.orgcde = '03' and t.objtyp = 'CL' then '二期胶印仓库'\n" +
+                    "\t\t\t\t\t\t\twhen t.orgcde = '03' and t.objtyp in ('CC','CD','CT','CM') then '一期纸箱仓库'\n" +
+                    "\t\t\t\t\t\t\tWHEN T.ORGCDE = '03' AND T.OBJTYP = 'ZG' THEN '纸管成品仓库'\n" +
+                    "\t\t\t\t\tend\n" +
+                    "\t\t\t\t) as ck-- 仓库\n" +
+                    "\t\t\t\t\n" +
+                    "from pb_bcdr_ct t \n" +
+                    "left join ord_ct a on a.orgcde=t.orgcde and a.serial=t.serial\n" +
+                    "left join ord_bas b on b.orgcde=t.orgcde and  b.serial=t.serial" +
+                    "where t.created BETWEEN TO_DATE(#{startdate}, 'YYYY-MM-DD\"T\"HH24:MI:SS') AND TO_DATE(#{enddate}, 'YYYY-MM-DD\"T\"HH24:MI:SS')"
+//                    " from pb_bcdr_ct t where t.created BETWEEN TO_DATE(#{startdate}, 'YYYY-MM-DD\"T\"HH24:MI:SS') AND TO_DATE(#{enddate}, 'YYYY-MM-DD\"T\"HH24:MI:SS')"
 //                    " from pb_bcdr_ct t where rownum<10 ORDER BY t.created DESC"
 //                    "from pb_bcdr_ct t where  rownum<2 and t.pono='CTRA220117026' ORDER BY t.created DESC"
 //                    "from pb_bcdr_ct t where t.created>sysdate-1  and rownum<110 "

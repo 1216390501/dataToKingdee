@@ -23,6 +23,8 @@ public class Instok {
     private String lastIn; // 最后入库时间
     private String unit; // 交货单位
     private String proline; // 生产线
+    private String bm; // 生产线
+    private String ck; // 生产线
     private BigDecimal qty; // 数量
 
 }
